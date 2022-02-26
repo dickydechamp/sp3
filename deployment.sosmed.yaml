@@ -1,0 +1,44 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: sosmed-app
+  namespace: production
+  labels:
+    app: sosmed-app
+spec:
+  selector:
+    matchLabels:
+      app: sosmed-app
+  replicas: 1
+  template:
+    metadata:
+      labels:
+        app: sosmed-app
+    spec:
+      volumes:
+      - name: config-fb
+        configMap:
+          name: p-fb-configmap
+      containers:
+      - name: sosmed-app
+        image: dickydechamp/pesbuk
+        imagePullPolicy: Always
+        ports:
+        - containerPort: 80
+        volumeMounts:
+        - name: config-fb
+          mountPath: "/var/www/html/config.php"
+          subPath: "config.php"
+---
+
+apiVersion: v1
+kind: Service
+metadata:
+  name: sosmed-service
+  namespace: production
+spec:
+  selector:
+    app: sosmed-app
+  ports:
+  - port: 8080
+    targetPort: 80

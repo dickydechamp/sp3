@@ -1,0 +1,41 @@
+apiVersion: apps/latest
+kind: Deployment
+metadata:
+  name: landingpage
+  namespace: production
+spec:
+  selector:
+    matchExpressions:
+      - key: app
+        operator: In
+        values:
+          - landingpage
+      - key: env
+        operator: In
+        values:
+          - production
+  template:
+    metadata:
+      labels:
+        app: landingpage
+        env: production
+    spec:
+      containers:
+      - name: landingpage
+        image: dickydechamp/landingpage
+        ports:
+        - containerPort: 80
+
+---
+
+apiVersion: v1
+kind: Service
+metadata:
+  name: landingpage-service
+  namespace: production
+spec:
+  selector:
+    app: landingpage
+  ports:
+  - nodeport: 8081
+    targetPort: 80
